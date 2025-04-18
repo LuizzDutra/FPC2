@@ -23,7 +23,7 @@ class Tree {
   public:
     Node<T>* root = nullptr;
 
-    bool insert(int val){
+    bool insert(T val){
       if (this->root == nullptr){
         root = Node<T>::neo(val);
         return true;
@@ -65,6 +65,10 @@ class Tree {
       return node;
     }
 
+    Node<T>* search(T val){
+      return Tree<T>::search(this->root, val);
+    }
+
     static Node<T>* minimum(Node<T>* node){
       if(node == nullptr){
         return nullptr;
@@ -86,17 +90,27 @@ class Tree {
     }
 
     static Node<T>* predecessor(Node<T>* node){
-      if(node != nullptr && node->left != nullptr){
-        return Tree<T>::maximum(node->left);
+      if (node->left != nullptr){
+        return Tree::maximum(node->left);
       }
-      return nullptr;
+      Node<T>* p = node->parent;
+      while (p != nullptr && node == p->left){
+        node = p;
+        p = p->parent;
+      }
+      return p;
     }
 
     static Node<T>* successor(Node<T>* node){
-      if(node != nullptr && node->right != nullptr){
-        return Tree<T>::minimum(node->right);
+      if (node->right != nullptr){
+        return Tree::minimum(node->right);
       }
-      return nullptr;
+      Node<T>* p = node->parent;
+      while (p != nullptr && node == p->right){
+        node = p;
+        p = p->parent;
+      }
+      return p;
     }
 
     static void traverse(Node<T>* node){
@@ -105,6 +119,10 @@ class Tree {
         traverse(node->left);
         traverse(node->right);
       }
+    }
+
+    void traverse(){
+      Tree<T>::traverse(this->root);
     }
 
     static Tree<T>* from_vec(std::vector<T> &vec){
@@ -118,7 +136,7 @@ class Tree {
 };
 
 
-int find_duplicates(std::vector<int> &vec){
+int count_duplicates(std::vector<int> &vec){
   Tree<int>* tree = new(Tree<int>);
 
   size_t duplicate_count = 0;
@@ -139,17 +157,18 @@ void print(T text){
 
 int main(){
   std::vector<int> test = {2, 3, 2, 5, 45, 23, 16, 5, -40, -2, 10, -50};
-  std::cout << find_duplicates(test) << "\n";
+  //std::cout << count_duplicates(test) << "\n";
+ 
   Tree<int>* tree = Tree<int>::from_vec(test);
-  Tree<int>::traverse(tree->root);
-  std::cout << '\n';
+  tree->traverse();
+  std::cout << '\n'; 
   /*
   print(Tree<int>::minimum(tree->root)->data);
   print(Tree<int>::maximum(tree->root)->data);
-  print(Tree<int>::predecessor(Tree<int>::minimum(tree->root)));
+  print(Tree<int>::successor(Tree<int>::minimum(tree->root))->data);
   */
   
-  Node<int>* s = Tree<int>::search(tree->root, 0);
+  Node<int>* s = tree->search(23);
   if (s != nullptr){
     print(s->data);
   }else{
