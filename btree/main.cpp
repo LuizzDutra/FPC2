@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <initializer_list>
 
 template <typename T>
 class Node{
@@ -125,10 +126,10 @@ class Tree {
       Tree<T>::traverse(this->root);
     }
 
-    static Tree<T>* from_vec(std::vector<T> &vec){
+    static Tree<T>* from(std::initializer_list<T> list){
       Tree<T>* tree = new(Tree<T>);
-      for(size_t i = 0; i < vec.size(); i++){
-        tree->insert(vec[i]);
+      for (auto i : list){
+        tree->insert(i);
       }
       return tree;
     }
@@ -156,10 +157,12 @@ void print(T text){
 
 
 int main(){
-  std::vector<int> test = {2, 3, 2, 5, 45, 23, 16, 5, -40, -2, 10, -50};
-  //std::cout << count_duplicates(test) << "\n";
+  std::vector<int> test = {6, 2, 4, 9, 32, 4, 6, 75, 9};
+
+  std::cout << "Duplicates: " << count_duplicates(test) << "\n";
  
-  Tree<int>* tree = Tree<int>::from_vec(test);
+  Tree<int>* tree = Tree<int>::from({2, 3, 2, 5, 45, 23, 16, 5, -40, -2, 10, -50});
+  std::cout << '\n';
   tree->traverse();
   std::cout << '\n'; 
   /*
@@ -168,11 +171,11 @@ int main(){
   print(Tree<int>::successor(Tree<int>::minimum(tree->root))->data);
   */
   
-  Node<int>* s = tree->search(23);
+  Node<int>* s = tree->search(1);
   if (s != nullptr){
     print(s->data);
   }else{
-    print(s);
+    print("nullptr");
   }
 
   return 0;
