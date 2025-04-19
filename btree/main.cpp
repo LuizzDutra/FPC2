@@ -53,6 +53,12 @@ class Tree {
       return true;
     }
 
+    void insert(std::initializer_list<T> list){
+      for (T i : list){
+        this->insert(i);
+      }
+    }
+
     static Node<T>* search(Node<T>* node, T val){
       while (node != nullptr){
         if (val < node->data){
@@ -114,6 +120,38 @@ class Tree {
       return p;
     }
 
+    void remove(Node<T>* del_node){
+      Node<T>* node = nullptr;
+      Node<T>* piv_node = nullptr;
+
+      if (del_node->left == nullptr || del_node->right == nullptr){
+        node = del_node;
+      }else{
+        node = Tree<T>::successor(del_node);
+      }
+
+      if (node->left != nullptr){
+        piv_node = node->left;
+      }else{
+        piv_node = node->right;
+      }
+      if (piv_node != nullptr){piv_node->parent = node->parent;}
+
+      if (node->parent == nullptr){
+        this->root = piv_node;
+      }else if (node == node->parent->left){
+        node->parent->left = piv_node;
+      }else{
+        node->parent->right = piv_node;
+      }
+
+      if (node != del_node){
+        del_node->data = node->data;
+      }
+      delete node;
+
+    }
+
     static void traverse(Node<T>* node){
       if (node != nullptr){
         std::cout << node->data << "\n";
@@ -133,6 +171,20 @@ class Tree {
       }
       return tree;
     }
+
+    void free(){
+      this->free_traversal(this->root);
+      this->root = nullptr;
+    }
+
+    void free_traversal(Node<T>* node){
+      if (node != nullptr){
+        free_traversal(node->left);
+        free_traversal(node->right);
+        delete node;
+      }
+    }
+
 
 };
 
@@ -156,27 +208,26 @@ void print(T text){
 }
 
 
-int main(){
-  std::vector<int> test = {6, 2, 4, 9, 32, 4, 6, 75, 9};
-
+int main(int argc, char* argv[]){
+  std::vector<int> test = {10, 4, 3, 20, 10, 3, 5, 34, 3};
   std::cout << "Duplicates: " << count_duplicates(test) << "\n";
- 
-  Tree<int>* tree = Tree<int>::from({2, 3, 2, 5, 45, 23, 16, 5, -40, -2, 10, -50});
-  std::cout << '\n';
+
+  print("Slide delete example tree");
+  Tree<int>* tree = Tree<int>::from({15, 5, 16, 3, 12, 20, 10, 13, 18, 23, 6, 7});
   tree->traverse();
   std::cout << '\n'; 
-  /*
-  print(Tree<int>::minimum(tree->root)->data);
-  print(Tree<int>::maximum(tree->root)->data);
-  print(Tree<int>::successor(Tree<int>::minimum(tree->root))->data);
-  */
-  
-  Node<int>* s = tree->search(1);
-  if (s != nullptr){
-    print(s->data);
-  }else{
-    print("nullptr");
+
+  tree->remove(tree->search(5));
+  print("Tree after deletion of 5");
+  tree->traverse();
+  print(' ');
+
+  print("Arguments Tree");
+  Tree<int>* arg_tree = new(Tree<int>);
+  for (int i = 1; i < argc; i++){
+    arg_tree->insert(atoi(argv[i]));
   }
+  arg_tree->traverse();
 
   return 0;
 }
